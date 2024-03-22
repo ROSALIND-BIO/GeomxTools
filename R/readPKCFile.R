@@ -98,13 +98,15 @@ function(file, default_pkc_vers=NULL)
 
 
 generate_pkc_lookup <- function(jsons_vec) {
-  lookup_df <- data.frame(RTS_ID=character(), 
-                          Target=character(), 
-                          Module=character(), 
-                          CodeClass=character(), 
-                          ProbeID=character(), 
-                          GeneID=character(), 
-                          SystematicName=character(), 
+  total_count <-  sum(unlist(lapply(jsons_vec, function(curr_json) lapply(curr_json$Targets,function(targets)length(targets$Probes)))))
+  current_count <- 1
+  lookup_df <- data.frame(RTS_ID=character(total_count),
+                          Target=character(total_count),
+                          Module=character(total_count),
+                          CodeClass=character(total_count),
+                          ProbeID=character(total_count),
+                          GeneID=character(total_count),
+                          SystematicName=character(total_count),
                           stringsAsFactors=FALSE)
   for (curr_idx in seq_len(length(jsons_vec))) {
     curr_module <- names(jsons_vec)[curr_idx]
@@ -131,9 +133,10 @@ generate_pkc_lookup <- function(jsons_vec) {
         }
         curr_probe_ID <- prb$ProbeID
         
-        lookup_df[nrow(lookup_df) + 1, ] <- 
+        lookup_df[current_count, ] <- 
           list(curr_RTS_ID, curr_targ, curr_module, curr_code_class, 
                curr_probe_ID, curr_gene_ID, curr_syst_name)
+        current_count <- current_count + 1
       }
     }
   }
